@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffe6e6;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #ff4d4d;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        #yesBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #noBtn {
+            background-color: #f44336;
+            color: white;
+            position: fixed;
+        }
+        #yesBtn:hover {
+            transform: scale(1.1);
+        }
+        .heart {
+            position: fixed;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bg-music" autoplay loop muted>
+        <source src="bg.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        function unmuteAudio() {
+            let audio = document.getElementById("bg-music");
+            audio.muted = false; // Unmutes the audio
+            audio.play();
+        }
+    </script>
+    
+
+    <div class="container">
+        <h1>Will you be my valentine?</h1>
+        <div class="buttons">
+            <button onclick="unmuteAudio()" id="yesBtn" class="btn">Yes</button>
+            <button id="noBtn" class="btn">No</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        let noBtnSize = 16; // Starting font size in pixels
+        let yesBtnSize = 16; // Starting font size in pixels
+
+        yesBtn.addEventListener('click', () => {
+            alert("Yay! Happy Valentine's Day! ❤️");
+            explodeHearts();
+        });
+
+        noBtn.addEventListener('mouseover', moveButton);
+
+        function moveButton() {
+            const maxX = window.innerWidth - noBtn.offsetWidth;
+            const maxY = window.innerHeight - noBtn.offsetHeight;
+
+            let newX = Math.random() * maxX;
+            let newY = Math.random() * maxY;
+
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+
+            // Decrease No button size
+            noBtnSize = Math.max(noBtnSize - 0.5, 8); // Minimum size of 8px
+            noBtn.style.fontSize = `${noBtnSize}px`;
+
+            // Increase Yes button size
+            yesBtnSize += 0.5;
+            yesBtn.style.fontSize = `${yesBtnSize}px`;
+        }
+
+        function explodeHearts() {
+            for (let i = 0; i < 50; i++) {
+                createHeart(yesBtn.getBoundingClientRect());
+            }
+        }
+
+        function createHeart(startRect) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart');
+            heart.style.fontSize = `${Math.random() * (30 - 10) + 10}px`;
+            
+            // Start position (center of the Yes button)
+            const startX = startRect.left + startRect.width / 2;
+            const startY = startRect.top + startRect.height / 2;
+            
+            // Set initial position
+            heart.style.left = `${startX}px`;
+            heart.style.top = `${startY}px`;
+            
+            document.body.appendChild(heart);
+
+            // Initial explosion animation
+            const endX = Math.random() * window.innerWidth;
+            const endY = Math.random() * window.innerHeight;
+            const animationDuration = Math.random() * 2 + 1; // 1-3 seconds
+
+            heart.animate([
+                { transform: `translate(0, 0) rotate(0deg)` },
+                { transform: `translate(${endX - startX}px, ${endY - startY}px) rotate(${Math.random() * 360}deg)` }
+            ], {
+                duration: animationDuration * 1000,
+                easing: 'ease-out',
+                fill: 'forwards'
+            }).onfinish = () => {
+                // Start continuous floating after explosion
+                floatHeart(heart);
+            };
+        }
+
+        function floatHeart(heart) {
+            const floatDuration = Math.random() * 10 + 5; // 5-15 seconds
+            let startX = parseFloat(heart.style.left);
+            let startY = parseFloat(heart.style.top);
+
+            function animate() {
+                const endX = Math.random() * window.innerWidth;
+                const endY = Math.random() * window.innerHeight;
+
+                heart.animate([
+                    { transform: `translate(0, 0)` },
+                    { transform: `translate(${endX - startX}px, ${endY - startY}px)` }
+                ], {
+                    duration: floatDuration * 1000,
+                    easing: 'ease-in-out',
+                    fill: 'forwards'
+                }).onfinish = () => {
+                    startX = endX;
+                    startY = endY;
+                    heart.style.left = `${startX}px`;
+                    heart.style.top = `${startY}px`;
+                    animate(); // Continue the animation
+                };
+            }
+
+            animate(); // Start the continuous animation
+        }
+    </script>
+</body>
+</html>
